@@ -145,6 +145,24 @@ class Board:
         
         return False
         
+    def generate_next_states(self, player):
+        next_states = []
+        for i in range(7):
+            new_board = Board(self.board)
+            if self.move_possible(i):
+                new_board.add_coin(i, player)
+                next_states.append(new_board)
+                #new_board.print_board()
+                #print()
+        return next_states
+    
+    def print_board(self):
+        for i in range(6):
+            for j in range(7):
+                print(self.board[i][j],  end=" ")
+            print()
+
+
         
 
 
