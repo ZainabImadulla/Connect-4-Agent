@@ -29,7 +29,7 @@ class Board:
         return True
     
     def check_won(self):
-        return self.check_vertical or self.check_horizontal or self.check_diagonal
+        return self.check_vertical() or self.check_horizontal() or self.check_diagonal()
 
 
     def check_vertical(self):
