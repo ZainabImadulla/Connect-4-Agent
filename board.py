@@ -162,6 +162,9 @@ class Board:
                 print(self.board[i][j],  end=" ")
             print()
 
+    def getBoard(self):
+        self.print_board()
+        return self.board
 
         
 

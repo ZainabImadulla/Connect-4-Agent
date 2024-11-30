@@ -69,6 +69,7 @@ class BoardTests(unittest.TestCase):
                         [1, 0, 1, 0, 0, 0, 1]])
         board3.add_coin(0, 1)
         self.assertTrue(board3.has_coin(1, 0))
+        board3.print_board()
         board3.add_coin(0, 1)
         self.assertTrue(board3.has_coin(0, 0))
 
@@ -177,9 +178,6 @@ class BoardTests(unittest.TestCase):
                     [1, 2, 2, 2, 2, 2, 2],
                     [2, 2, 1, 1, 2, 2, 1]])
         ])
-
-
-
 
 
 
