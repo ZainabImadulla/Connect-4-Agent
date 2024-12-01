@@ -44,6 +44,13 @@ class BoardTests(unittest.TestCase):
                     [2, 1, 2, 2, 1, 0, 1],
                     [1, 2, 1, 0, 0, 2, 2],
                     [2, 2, 1, 1, 2, 2, 1]])
+    
+    board9 = Board([[0, 0, 0, 1, 0, 0, 2],
+                    [0, 0, 1, 0, 0, 0, 1],
+                    [1, 1, 0, 1, 1, 0, 2],
+                    [2, 1, 2, 2, 1, 0, 1],
+                    [1, 2, 1, 0, 0, 2, 2],
+                    [2, 2, 1, 1, 2, 2, 1]])
 
 
 
@@ -178,6 +185,20 @@ class BoardTests(unittest.TestCase):
                     [1, 2, 2, 2, 2, 2, 2],
                     [2, 2, 1, 1, 2, 2, 1]])
         ])
+
+    def testInARowHorizontal(self):
+        '''
+            self.assertEqual(self.board1.in_a_row_horizontal(5, 1, 2), 0)
+            self.assertEqual(self.board1.in_a_row_horizontal(5, 1, 3), 0)
+            self.assertEqual(self.board1.in_a_row_horizontal(5, 2, 2), 0)
+            self.assertEqual(self.board5.in_a_row_horizontal(2, 2, 2), 1)
+            self.assertEqual(self.board5.in_a_row_horizontal(3, 2, 2), 1)
+            self.assertEqual(self.board8.in_a_row_horizontal(3, 2, 2), 0)
+         '''   
+        self.assertEqual(self.board9.in_a_row_horizontal(2, 1, 2), 2)
+
+       
+
 
 
 

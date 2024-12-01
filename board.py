@@ -1,11 +1,14 @@
 # Board.py
 # Represents a board in a game of connect 4
+import copy
+
+
 class Board:
     def __init__(self, board=None):
         if(board == None):
             self.board = [[0] * 7 for i in range(6)]
         else:
-            self.board = board
+            self.board = copy.deepcopy(board)
 
 
     def add_coin(self, column, player):
@@ -166,10 +169,33 @@ class Board:
         self.print_board()
         return self.board
 
-        
+    
+    def in_a_row_horizontal(self, row, player, num):
+        total_num_in_row = 0
+        count = 0
+        empty_space = 0
+        for i in range(7):
+           # print(str(row) + " , " + str(i) + " = " + str(self.board[row][i]))
+            if self.board[row][i] == player:
+                count += 1
+                if count == num and empty_space >= 1:
+                    print("reached")
+                    total_num_in_row += 1
+                    count = 0
+            elif self.board[row][i] == (3 - player):
+                count = 0
+                empty_space = 0
+            elif self.board[row][i] == 0:
+                empty_space += 1
+                if count == num and empty_space >= 1:
+                    print("reached")
+                    total_num_in_row += 1
+                    count = 0
 
-
-       
+            print("in column " + str(i))
+            print("count " + str(count))
+            print("empty space " + str(empty_space))
+        return total_num_in_row
 
 
 
