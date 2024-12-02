@@ -126,91 +126,13 @@ class BoardTests(unittest.TestCase):
 
     def testGenerateNextStates(self):
         board_new = Board()
-        new_states = board_new.generate_next_states(2)
+        new_states = board_new.generate_possible_moves()
         self.assertTrue(new_states, 
-            [
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [2, 0, 0, 0, 0, 0, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 2, 0, 0, 0, 0, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 2, 0, 0, 0, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 2, 0, 0, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 2, 0, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 2, 0]]),
-                Board([[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 2]])])
+            [0, 1, 2 ,3, 4, 5, 6])
         
-        set_two = self.board5.generate_next_states(1)
-        self.assertTrue(set_two, [
-                Board([[0, 0, 0, 0, 0, 0, 2],
-                    [1, 0, 1, 0, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 0, 2, 2, 0, 0, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]]),
-            Board([[0, 0, 0, 0, 0, 0, 2],
-                    [0, 0, 1, 0, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 1, 2, 2, 0, 0, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]]),
-            Board([[0, 0, 1, 0, 0, 0, 2],
-                    [0, 0, 1, 0, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 0, 2, 2, 0, 0, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]]),
-                    Board([[0, 0, 0, 0, 0, 0, 2],
-                    [0, 0, 1, 1, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 0, 2, 2, 0, 0, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]]),
-                    Board([[0, 0, 0, 0, 0, 0, 2],
-                    [0, 0, 1, 0, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 0, 2, 2, 1, 0, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]]),
-                    Board([[0, 0, 0, 0, 0, 0, 2],
-                    [0, 0, 1, 0, 0, 0, 1],
-                    [1, 0, 2, 2, 0, 0, 2],
-                    [2, 0, 2, 2, 0, 1, 1],
-                    [1, 2, 2, 2, 2, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]])
-        ])
+        set_two = self.board5.generate_possible_moves()
+        self.assertTrue(set_two, [0, 1, 2,3 ,4 ,5])
+        
 
 
     def testIsBoardFull(self):
@@ -236,6 +158,23 @@ class BoardTests(unittest.TestCase):
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 2, 0]])
         self.assertTrue(this_board.eval_function(2), 4)
+
+    def testInARowHorizontal(self):
+        self.assertEqual(self.board10.in_a_row_horizontal( 1, 2), 2)
+        self.assertEqual(self.board11.in_a_row_horizontal( 2, 2), 2)
+        self.assertEqual(self.board10.in_a_row_horizontal( 1, 3), 1)
+        self.assertEqual(self.board10.in_a_row_horizontal( 1, 2), 2)
+        self.assertEqual(self.board10.in_a_row_horizontal( 2, 2), 0)
+        self.assertEqual(self.board5.in_a_row_horizontal( 2, 2), 3)
+        self.assertEqual(self.board9.in_a_row_horizontal(1, 3), 1)
+        self.assertEqual(self.board9.in_a_row_horizontal( 2, 3), 1)
+            
+
+    def testInARowVertical(self):
+        self.assertEqual(self.board9.in_a_row_vertical( 2,2), 3)
+        self.assertEqual(self.board9.in_a_row_vertical(1 ,2), 2)
+        self.assertEqual(self.board9.in_a_row_vertical(2,2), 3)
+        self.assertEqual(self.board9.in_a_row_vertical( 2, 3), 1)
 
 
 
