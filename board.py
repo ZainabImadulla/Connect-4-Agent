@@ -1,7 +1,9 @@
 # Board.py
 # Represents a board in a game of connect 4
 import copy
-
+import math
+import random
+import numpy as np
 
 class Board:
     def __init__(self, board=None):
@@ -13,7 +15,7 @@ class Board:
 
     def add_coin(self, column, player):
         for i in range(5, -1, -1):
-            if not self.has_coin(i, column):
+            if not self.has_any_coin(i, column):
                 self.board[i][column] = player
                 break
         
@@ -22,69 +24,70 @@ class Board:
             return False
         possible = False
         for i in range(5, -1, -1):
-            possible = possible or not self.has_coin(i, column)
+            possible = possible or not self.has_any_coin(i, column)
         
         return possible
 
-    def has_coin(self, row, column):
+    def has_specific_coin(self, row, column, player):
+        if self.board[row][column] == player:
+            return True
+        return False
+    
+    def has_any_coin(self, row, column):
         if self.board[row][column] == 0:
             return False
         return True
     
-    def check_won(self):
-        return self.check_vertical() or self.check_horizontal() or self.check_diagonal()
+    def check_won(self, player):
+        return self.check_vertical(player) or self.check_horizontal(player) or self.check_diagonal(player)
+
+    
+    def is_board_full(self):
+        for i in range(7):
+            for j in range(6):
+                if self.board[j][i] == 0:
+                    return False
+        return True  
+    
+    def terminal_state(self):
+        return self.is_board_full() or self.check_won(1) or self.check_won(2)
 
 
-    def check_vertical(self):
+    def check_vertical(self, player):
         for x in range(7):
             count = 0
-            prev_coin = 0
             for y in range(6):
-                if self.has_coin(y, x) and count == 0 and self.board[y][x] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[y][x]
-                elif self.has_coin(y, x) and prev_coin == self.board[y][x]:
+                if self.has_specific_coin(y, x, player):
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[y][x]
         return False
                 
-    def check_horizontal(self):
+    def check_horizontal(self, player):
         for x in range(6):
             count = 0
-            prev_coin = 0
             for y in range(7):
-                if self.has_coin(x, y) and count == 0 and self.board[x][y] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[x][y]
-                elif self.has_coin(x, y) and prev_coin == self.board[x][y]:
+                if self.has_specific_coin(x, y, player):
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[x][y]
         return False
 
-    def check_diagonal(self):
+    def check_diagonal(self, player):
         for f in range(3, 6):
             count = 0
             x = 0
-            prev_coin = 0
             for z in range(f, -1, -1):
-                if self.has_coin(z, x) and count == 0 and self.board[z][x] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[z][x]
-                elif self.has_coin(z, x) and prev_coin == self.board[z][x]:
+                if self.has_specific_coin(z, x, player) :
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[z][x]
                 x += 1
             if count >= 4:
                 return True
@@ -93,16 +96,12 @@ class Board:
             count = 0
             y = 5
             for z in range(f, 6):
-                if self.has_coin(y, z) and count == 0 and self.board[y][z] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[y][z]
-                elif self.has_coin(y, z) and prev_coin == self.board[y][z]:
+                if self.has_specific_coin(y, z, player):
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[y][z]
                 y -= 1
             if count >= 4:
                 return True
@@ -111,18 +110,13 @@ class Board:
         for f in range(3, 6):
             count = 0
             x = 6
-            prev_coin = 0
             for z in range(f, -1, -1):
-                if self.has_coin(z, x) and count == 0 and self.board[z][x] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[z][x]
-                elif self.has_coin(z, x) and prev_coin == self.board[z][x]:
+                if self.has_specific_coin(z, x, player):
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[z][x]
                 x -= 1
             if count >= 4:
                 return True
@@ -130,22 +124,16 @@ class Board:
         for f in range(3, 7):
             count = 0
             y = 5
-            prev_coin = 0
             for z in range(f, -1, -1):
-                if self.has_coin(y, z) and count == 0 and self.board[y][z] != prev_coin:
-                    count = 1
-                    prev_coin = self.board[y][z]
-                elif self.has_coin(y, z) and prev_coin == self.board[y][z]:
+                if self.has_specific_coin(y, z, player):
                     count += 1
                     if count == 4:
                         return True
                 else: 
                     count = 0
-                prev_coin = self.board[y][z]
                 y -= 1
             if count >= 4:
                 return True
-        
         return False
         
     def generate_next_states(self, player):
@@ -169,43 +157,66 @@ class Board:
         self.print_board()
         return self.board
 
-    
-    def in_a_row_horizontal(self, row, player, num):
-        total_num_in_row = 0
-        count = 0
-        empty_space = 0
-        for i in range(7):
-           # print(str(row) + " , " + str(i) + " = " + str(self.board[row][i]))
-            if self.board[row][i] == player:
-                count += 1
-                if count == num and empty_space >= 1:
-                    print("reached")
-                    total_num_in_row += 1
-                    count = 0
-            elif self.board[row][i] == (3 - player):
-                count = 0
-                empty_space = 0
-            elif self.board[row][i] == 0:
-                empty_space += 1
-                if count == num and empty_space >= 1:
-                    print("reached")
-                    total_num_in_row += 1
-                    count = 0
+    def eval_function(self, player):
+        score = 0
+        opponent = 3 - player
 
-            print("in column " + str(i))
-            print("count " + str(count))
-            print("empty space " + str(empty_space))
-        return total_num_in_row
-
-
-
-
-
+        eval_board = np.array(
+                    [[3, 4, 5, 7, 5, 4, 3],
+                    [4, 6, 8, 10, 8, 6, 4],
+                    [5, 7, 11, 13, 11, 7, 5],
+                    [5, 7, 11, 13, 11, 7, 5],
+                    [4, 6, 8, 10, 8, 6, 4],
+                    [3, 4, 5, 7, 5, 4, 3]])
         
+        player_score = np.sum(eval_board[self.board == player])
+        opponent_score = np.sum(eval_board[self.board == opponent])
+        score = player_score - opponent_score
+        return score
+    
+    def minimax(self, depth, alpha, beta, maximizing_turn, player):
+        opponent = 3 - player
+        next_states = self.generate_next_states(player) 
+        terminal = self.terminal_state()
 
 
-       
+        if depth == 0 or terminal:
+            if terminal:
+                if self.check_won(player):
+                    return (self, math.inf)
+                elif self.check_won(opponent):
+                    return (self, -math.inf)
+                else: 
+                    return (self, 0)
+        else:
+            return (self, self.eval_function(player))
+        
+        if maximizing_turn:
+            value = -math.inf
+            next_state = random.choice(next_states)
+            for state in next_states:
+                new_score = state.minimax(depth - 1, alpha, beta, False)[1]
+            
+                if new_score > value:
+                    value = new_score
+                    next_state = state
+                alpha = max(alpha, value)
 
+                if alpha >= beta:
+                    break
+            return next_state, value
+        
+        else:
+            value = math.inf
+            next_state = random.choice(next_states)
+            for state in next_states:
+                new_score = state.minimax(depth - 1, alpha, beta, True)[1]
 
+                if new_score < value:
+                    value = new_score
+                    next_state = state
+                    beta = min(beta, value)
 
-
+                if alpha >= beta:
+                    break
+            return next_state, value

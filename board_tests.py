@@ -1,5 +1,6 @@
 import unittest
 from board import Board
+import numpy as np
 
 class BoardTests(unittest.TestCase):
     board1 = Board()
@@ -45,13 +46,33 @@ class BoardTests(unittest.TestCase):
                     [1, 2, 1, 0, 0, 2, 2],
                     [2, 2, 1, 1, 2, 2, 1]])
     
-    board9 = Board([[0, 0, 0, 1, 0, 0, 2],
-                    [0, 0, 1, 0, 0, 0, 1],
-                    [1, 1, 0, 1, 1, 0, 2],
-                    [2, 1, 2, 2, 1, 0, 1],
+    board9 = Board([[0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 2, 2, 2, 0],
+                    [1, 1, 0, 1, 1, 2, 0],
+                    [2, 1, 2, 2, 1, 0, 2],
                     [1, 2, 1, 0, 0, 2, 2],
-                    [2, 2, 1, 1, 2, 2, 1]])
-
+                    [2, 2, 1, 1, 2, 2, 2]])
+    
+    board10 = Board([[0, 0, 0, 0, 0, 0, 2],
+                    [0, 0, 1, 0, 0, 0, 1],
+                    [1, 0, 2, 0, 0, 0, 2],
+                    [1, 0, 2, 0, 0, 0, 1],
+                    [1, 0, 2, 0, 0, 0, 2],
+                    [1, 0, 1, 1, 0, 0, 1]])
+    
+    board11 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [2, 0, 2, 0, 2, 0, 1]])
+    
+    board12 =Board([[1, 2, 2, 1, 1, 2, 1],
+                    [2, 1, 2, 2, 2, 2, 2],
+                    [1, 1, 1, 1, 1, 2, 1],
+                    [2, 1, 2, 2, 1, 2, 2],
+                    [1, 2, 1, 2, 1, 2, 2],
+                    [2, 2, 1, 1, 2, 2, 2]])
 
 
     def testMovePossible(self):
@@ -63,9 +84,14 @@ class BoardTests(unittest.TestCase):
 
 
     def testhasCoin(self):
-        self.assertFalse(self.board1.has_coin(0, 0))
-        self.assertTrue(self.board2.has_coin(5, 6))
-        self.assertTrue(self.board2.has_coin(5, 0))
+        self.assertFalse(self.board1.has_any_coin(0, 0))
+        self.assertTrue(self.board2.has_any_coin(5, 6))
+        self.assertTrue(self.board2.has_any_coin(5, 0))
+        self.assertFalse(self.board1.has_specific_coin(0, 0, 1))
+        self.assertTrue(self.board2.has_specific_coin(5, 6, 1))
+        self.assertTrue(self.board2.has_specific_coin(5, 0, 1))
+        self.assertFalse(self.board2.has_specific_coin(5, 0, 2))
+
 
     def testAddCoin(self):
         board3 = Board([[0, 0, 0, 0, 0, 0, 2],
@@ -75,28 +101,28 @@ class BoardTests(unittest.TestCase):
                         [1, 0, 2, 0, 0, 0, 2],
                         [1, 0, 1, 0, 0, 0, 1]])
         board3.add_coin(0, 1)
-        self.assertTrue(board3.has_coin(1, 0))
+        self.assertTrue(board3.has_specific_coin(1, 0, 1))
         board3.print_board()
         board3.add_coin(0, 1)
-        self.assertTrue(board3.has_coin(0, 0))
+        self.assertTrue(board3.has_specific_coin(0, 0, 1))
 
     def testCheckVertical(self):
-        self.assertFalse(self.board1.check_vertical())
-        self.assertTrue(self.board2.check_vertical())
-        self.assertFalse(self.board4.check_vertical())
+        self.assertFalse(self.board1.check_vertical(1))
+        self.assertTrue(self.board2.check_vertical(1))
+        self.assertFalse(self.board4.check_vertical(2))
 
     def testCheckHorizontak(self):
-        self.assertFalse(self.board1.check_horizontal())
-        self.assertTrue(self.board2.check_horizontal())
-        self.assertTrue(self.board4.check_horizontal())
+        self.assertFalse(self.board1.check_horizontal(1))
+        self.assertTrue(self.board2.check_horizontal(1))
+        self.assertTrue(self.board4.check_horizontal(2))
 
     def testCheckDiagonal(self):
-        self.assertFalse(self.board1.check_diagonal())
-        self.assertFalse(self.board2.check_diagonal())
-        self.assertTrue(self.board5.check_diagonal())
-        self.assertTrue(self.board6.check_diagonal())
-        self.assertTrue(self.board7.check_diagonal())
-        self.assertTrue(self.board8.check_diagonal())
+        self.assertFalse(self.board1.check_diagonal(2))
+        self.assertFalse(self.board2.check_diagonal(1))
+        self.assertTrue(self.board5.check_diagonal(2))
+        self.assertTrue(self.board6.check_diagonal(2))
+        self.assertTrue(self.board7.check_diagonal(2))
+        self.assertTrue(self.board8.check_diagonal(1))
 
     def testGenerateNextStates(self):
         board_new = Board()
@@ -186,21 +212,27 @@ class BoardTests(unittest.TestCase):
                     [2, 2, 1, 1, 2, 2, 1]])
         ])
 
-    def testInARowHorizontal(self):
-        '''
-            self.assertEqual(self.board1.in_a_row_horizontal(5, 1, 2), 0)
-            self.assertEqual(self.board1.in_a_row_horizontal(5, 1, 3), 0)
-            self.assertEqual(self.board1.in_a_row_horizontal(5, 2, 2), 0)
-            self.assertEqual(self.board5.in_a_row_horizontal(2, 2, 2), 1)
-            self.assertEqual(self.board5.in_a_row_horizontal(3, 2, 2), 1)
-            self.assertEqual(self.board8.in_a_row_horizontal(3, 2, 2), 0)
-         '''   
-        self.assertEqual(self.board9.in_a_row_horizontal(2, 1, 2), 2)
 
-       
+    def testIsBoardFull(self):
+        self.assertFalse(self.board1.is_board_full())
+        self.assertFalse(self.board9.is_board_full())
+        self.assertFalse(self.board10.is_board_full())
+
+        
+        self.assertTrue(self.board12.is_board_full())
+
+    def testIsTerminal(self):
+        self.assertTrue(self.board12.terminal_state())
+        self.assertTrue(self.board2.terminal_state())
+        self.assertTrue(self.board7.terminal_state())
+        self.assertFalse(self.board1.terminal_state())
+        self.assertFalse(self.board11.terminal_state())
 
 
 
+
+
+    
 
 def main():
     unittest.main()
