@@ -25,7 +25,6 @@ class Board:
         possible = False
         for i in range(5, -1, -1):
             possible = possible or not self.has_any_coin(i, column)
-        
         return possible
 
     def has_specific_coin(self, row, column, player):
@@ -136,17 +135,13 @@ class Board:
                 return True
         return False
         
-    def generate_next_states(self, player):
-        next_states = []
-        for i in range(7):
-            new_board = Board(self.board)
-            if self.move_possible(i):
-                new_board.add_coin(i, player)
-                next_states.append(new_board)
-                #new_board.print_board()
-                #print()
-        return next_states
-    
+    def generate_possible_moves(self):
+        possible_moves = []
+        for col in range(7):
+            if self.move_possible(col):
+                possible_moves.append(col)
+        return possible_moves
+        
     def print_board(self):
         for i in range(6):
             for j in range(7):
@@ -161,62 +156,84 @@ class Board:
         score = 0
         opponent = 3 - player
 
-        eval_board = np.array(
+        eval_board = Board(
                     [[3, 4, 5, 7, 5, 4, 3],
                     [4, 6, 8, 10, 8, 6, 4],
                     [5, 7, 11, 13, 11, 7, 5],
                     [5, 7, 11, 13, 11, 7, 5],
                     [4, 6, 8, 10, 8, 6, 4],
                     [3, 4, 5, 7, 5, 4, 3]])
-        
-        player_score = np.sum(eval_board[self.board == player])
-        opponent_score = np.sum(eval_board[self.board == opponent])
+        player_score = 0
+        opponent_score = 0
+        for i in range(7):
+            for j in range(6):
+                if self.board[j][i] == player:
+                    player_score += eval_board.board[j][i]
+                elif self.board[j][i] == opponent:
+                    opponent_score += eval_board.board[j][i]
+
+        print("player score")
+        print(player_score)
+        print("opponent score")
+        print(opponent_score)
         score = player_score - opponent_score
         return score
     
-    def minimax(self, depth, alpha, beta, maximizing_turn, player):
-        opponent = 3 - player
-        next_states = self.generate_next_states(player) 
+    def minimax(self, depth, alpha, beta, maximizing_turn):
+        player = 2
+        opponent = 1
+        possible_moves = self.generate_possible_moves() 
+        #print("Possible moves")
+        #print(possible_moves)
         terminal = self.terminal_state()
-
 
         if depth == 0 or terminal:
             if terminal:
                 if self.check_won(player):
-                    return (self, math.inf)
+                    return None, math.inf
                 elif self.check_won(opponent):
-                    return (self, -math.inf)
+                    return None, -math.inf
                 else: 
-                    return (self, 0)
-        else:
-            return (self, self.eval_function(player))
-        
-        if maximizing_turn:
-            value = -math.inf
-            next_state = random.choice(next_states)
-            for state in next_states:
-                new_score = state.minimax(depth - 1, alpha, beta, False)[1]
+                    return None, 0
+            else:
+                print("eval function")
+                print(self.eval_function(player))
+                return None, self.eval_function(player)
             
-                if new_score > value:
-                    value = new_score
-                    next_state = state
-                alpha = max(alpha, value)
+        if maximizing_turn:
+            score = -math.inf
+            next_move = random.choice(possible_moves)
+            
+            for move in possible_moves:
+                state = Board(self.board)
+                state.add_coin(move, player)
+                new_score = state.minimax(depth - 1, alpha, beta, False)[1]
+                print("in loop")
+            
+                if new_score > score:
+                    score = new_score
+                    next_move = move
+                alpha = max(alpha, score)
 
                 if alpha >= beta:
                     break
-            return next_state, value
+            print("score")
+            print(score)
+            return next_move, score
         
         else:
-            value = math.inf
-            next_state = random.choice(next_states)
-            for state in next_states:
+            score = math.inf
+            next_move = random.choice(possible_moves)
+            for move in possible_moves:
+                state = Board(self.board)
+                state.add_coin(move, player)
                 new_score = state.minimax(depth - 1, alpha, beta, True)[1]
 
-                if new_score < value:
-                    value = new_score
-                    next_state = state
-                    beta = min(beta, value)
+                if new_score < score:
+                    score = new_score
+                    next_move = move
+                    beta = min(beta, score)
 
                 if alpha >= beta:
                     break
-            return next_state, value
+            return next_move, score

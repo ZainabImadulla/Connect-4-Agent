@@ -1,3 +1,4 @@
+import math
 import customtkinter
 import tkinter as tk
 from board import Board
@@ -7,6 +8,7 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.player = 1
+        self.minimax = 2
         self.board = Board()
         self.buttons = [[0] * 7 for i in range(6)]
         self.label = customtkinter.CTkLabel(self, text="Player 1's Turn")
@@ -35,19 +37,16 @@ class App(customtkinter.CTk):
             elif self.board.is_board_full():
                 self.disable_board()
                 self.label = customtkinter.CTkLabel(self, text="Game Tied")  
-            else:
-                if(self.player == 1):
-                    self.player = 2
-                    self.label = customtkinter.CTkLabel(self, text="Player 2's Turn")
-                else:
-                    self.player = 1
-                    self.label = customtkinter.CTkLabel(self, text="Player 1's Turn")
+
+            move, _ = self.board.minimax(3, -math.inf, math.inf, True)
+            print(move)
+            #if move is not None and self.board.move_possible(move):
+            self.board.add_coin(move, self.minimax)
+            self.update_board()
+            self.label.grid_forget()
             self.label.grid(row=0, column=3)
        
         
-
-
-
     def disable_board(self):
         current_board = self.board.getBoard()
         for i in range(6):

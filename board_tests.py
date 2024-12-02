@@ -228,11 +228,16 @@ class BoardTests(unittest.TestCase):
         self.assertFalse(self.board1.terminal_state())
         self.assertFalse(self.board11.terminal_state())
 
+    def testEvalFunc(self):
+        this_board = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 2, 0]])
+        self.assertTrue(this_board.eval_function(2), 4)
 
 
-
-
-    
 
 def main():
     unittest.main()
