@@ -26,27 +26,39 @@ class App(customtkinter.CTk):
             self.board.add_coin(column, self.player)
             self.update_board()
             self.label.grid_forget()
-            self.check_game_over()
-        move, _ = self.board.minimax(4, -math.inf, math.inf, True)
-        self.board.add_coin(move, self.minimax)
-        self.update_board()
-        self.board.print_board()
-        self.label.grid_forget()
-        self.label.grid(row=0, column=3)
-        self.check_game_over()
+            self.label = customtkinter.CTkLabel(self, text="Player 2's Turn")
+            self.label.grid(row=0, column=3)
+            if(not self.check_game_over()):
+                move, _ = self.board.minimax(4, -math.inf, math.inf, True)
+                self.after(500, self.board.add_coin(move, self.minimax))
+                self.update_board()
+                self.label.grid_forget()
+                self.label = customtkinter.CTkLabel(self, text="Player 1's Turn")
+                self.label.grid(row=0, column=3)
+                self.check_game_over()
 
             
 
     def check_game_over(self):
         if self.board.check_won(1):
             self.disable_board()
+            self.label.grid_forget()
             self.label = customtkinter.CTkLabel(self, text="Player 1 Won")
+            self.label.grid(row=0, column=3)
+            return True
         elif self.board.check_won(2):
             self.disable_board()
-            self.label = customtkinter.CTkLabel(self, text="Player 2 Won")    
+            self.label.grid_forget()
+            self.label = customtkinter.CTkLabel(self, text="Player 2 Won")   
+            self.label.grid(row=0, column=3) 
+            return True
         elif self.board.is_board_full():
             self.disable_board()
+            self.label.grid_forget()
             self.label = customtkinter.CTkLabel(self, text="Game Tied")  
+            self.label.grid(row=0, column=3)
+            return True
+        return False
 
        
         

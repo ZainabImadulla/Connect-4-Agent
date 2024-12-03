@@ -21,7 +21,6 @@ class App(customtkinter.CTk):
                 self.buttons[i][j].grid(row=i+1, column=j)
 
     def handle_click(self, column):
-        print(self.board.move_possible(column))
         if(self.board.move_possible(column)):
             self.board.add_coin(column, self.player)
             self.update_board()
