@@ -1,3 +1,4 @@
+import math
 import unittest
 from board import Board
 import numpy as np
@@ -111,7 +112,7 @@ class BoardTests(unittest.TestCase):
         self.assertTrue(self.board2.check_vertical(1))
         self.assertFalse(self.board4.check_vertical(2))
 
-    def testCheckHorizontak(self):
+    def testCheckHorizontal(self):
         self.assertFalse(self.board1.check_horizontal(1))
         self.assertTrue(self.board2.check_horizontal(1))
         self.assertTrue(self.board4.check_horizontal(2))
@@ -123,6 +124,15 @@ class BoardTests(unittest.TestCase):
         self.assertTrue(self.board6.check_diagonal(2))
         self.assertTrue(self.board7.check_diagonal(2))
         self.assertTrue(self.board8.check_diagonal(1))
+
+    def testHasWon(self):
+        this_board6 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0]])
+        self.assertFalse(this_board6.check_won(2))
 
     def testGenerateNextStates(self):
         board_new = Board()
@@ -139,8 +149,6 @@ class BoardTests(unittest.TestCase):
         self.assertFalse(self.board1.is_board_full())
         self.assertFalse(self.board9.is_board_full())
         self.assertFalse(self.board10.is_board_full())
-
-        
         self.assertTrue(self.board12.is_board_full())
 
     def testIsTerminal(self):
@@ -157,25 +165,71 @@ class BoardTests(unittest.TestCase):
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 2, 0]])
-        self.assertTrue(this_board.eval_function(2), 4)
+        self.assertEqual(this_board.eval_function(2), 4)
+        this_board2 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 2, 1, 2, 0]])
+        self.assertEqual(this_board2.eval_function(2), 19)
+
+        this_board3 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 2, 1, 2, 0]])
+        self.assertEqual(this_board3.eval_function(2), 42)
+
+        this_board4 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 1, 1, 0, 0]])
+        self.assertEqual(this_board4.in_a_row_horizontal(1, 2), 2)
+        self.assertEqual(this_board4.eval_function(2), 64)
+        this_board5 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0],
+                    [0, 0, 0, 1, 1, 2, 0]])
+        self.assertEqual(this_board5.in_a_row_horizontal(1, 2), 1)
+
+        print("eval func board 5")
+        print(this_board5.eval_function(2))
+        self.assertEqual(this_board5.eval_function(2), 35)
+        this_board6 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0]])
+        self.assertEqual(this_board6.eval_function(2), -86)
+        #self.assertEqual(this_board6.minimax(3, -math.inf, math.inf, True), 4)
 
     def testInARowHorizontal(self):
         self.assertEqual(self.board10.in_a_row_horizontal( 1, 2), 2)
         self.assertEqual(self.board11.in_a_row_horizontal( 2, 2), 2)
-        self.assertEqual(self.board10.in_a_row_horizontal( 1, 3), 1)
+        self.assertEqual(self.board10.in_a_row_horizontal( 1, 3), 2)
         self.assertEqual(self.board10.in_a_row_horizontal( 1, 2), 2)
         self.assertEqual(self.board10.in_a_row_horizontal( 2, 2), 0)
-        self.assertEqual(self.board5.in_a_row_horizontal( 2, 2), 3)
+        self.assertEqual(self.board5.in_a_row_horizontal( 2, 2), 4)
         self.assertEqual(self.board9.in_a_row_horizontal(1, 3), 1)
-        self.assertEqual(self.board9.in_a_row_horizontal( 2, 3), 1)
+        self.assertEqual(self.board9.in_a_row_horizontal( 2, 3), 2)
             
 
     def testInARowVertical(self):
-        self.assertEqual(self.board9.in_a_row_vertical( 2,2), 3)
+        self.assertEqual(self.board9.in_a_row_vertical( 2,2), 4)
         self.assertEqual(self.board9.in_a_row_vertical(1 ,2), 2)
-        self.assertEqual(self.board9.in_a_row_vertical(2,2), 3)
         self.assertEqual(self.board9.in_a_row_vertical( 2, 3), 1)
 
+    def testInARowDiagonal(self):
+       # self.assertEqual(self.board4.in_a_row_diagonal(2,3), 2)
+        self.assertEqual(self.board4.in_a_row_diagonal(1,3), 0)
+       # self.assertEqual(self.board4.in_a_row_diagonal(2,2), 3)
 
 
 def main():
