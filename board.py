@@ -310,7 +310,28 @@ class Board:
             
         return total_num_in_row
     
-    
+    # method weigh_current_connections gets the weight of the given player by checking how many
+    # 2s, 3s, and 4s the player has in their current state, this is a helper method for eval_func
+    # (also abstracts duplicate code)
+    def weigh_current_connections(self, player, is_opponent):
+        score = 0
+        three_weight = 50
+        if is_opponent:
+            three_weight = 70
+        
+        two_diagonal = 10 * self.in_a_row_diagonal(player, 2)
+        three_diagonal = three_weight * self.in_a_row_diagonal(player, 3)
+        four_diagonal = 1000000 * self.in_a_row_diagonal(player, 4)
+        two_vertical = 10 * self.in_a_row_vertical(player, 2)
+        three_vertical = three_weight * self.in_a_row_vertical(player, 3)
+        four_vertical = 1000000 * self.in_a_row_vertical(player, 4)
+        two_horizontal = 10 * self.in_a_row_horizontal(player, 2)
+        three_horizontal = three_weight * self.in_a_row_horizontal(player, 3)
+        four_horizontal = 1000000 * self.in_a_row_horizontal(player, 4)
+        score += two_diagonal + two_horizontal + two_vertical
+        score += three_diagonal + three_horizontal + three_vertical
+        score += four_diagonal + four_horizontal + four_vertical
+        return score
         
     # method eval_function is used as a heuristic method to evaluate a given players board state
     # this method uses center weights as well as weighing how many 2 in a row, 3 in a row, and 4 in a row,
@@ -319,6 +340,7 @@ class Board:
         score = 0
         opponent = 3 - player
 
+        # set and apply weight for prioritizing center moves
         eval_board = Board(
                     [[3, 4, 5, 7, 5, 4, 3],
                     [4, 6, 8, 10, 8, 6, 4],
@@ -335,34 +357,10 @@ class Board:
                     player_score += eval_board.board[j][i]
                 elif self.board[j][i] == opponent:
                     opponent_score += eval_board.board[j][i]
-        
-        two_diagonal_player = 10 * self.in_a_row_diagonal(player, 2)
-        three_diagonal_player = 50 * self.in_a_row_diagonal(player, 3)
-        four_diagonal_player = 1000000 * self.in_a_row_diagonal(player, 4)
-        two_vertical_player = 10 * self.in_a_row_vertical(player, 2)
-        three_vertical_player = 50 * self.in_a_row_vertical(player, 3)
-        four_vertical_player = 1000000 * self.in_a_row_vertical(player, 4)
-        two_horizontal_player = 10 * self.in_a_row_horizontal(player, 2)
-        three_horizontal_player = 50 * self.in_a_row_horizontal(player, 3)
-        four_horizontal_player = 1000000 * self.in_a_row_horizontal(player, 4)
-        player_score += two_diagonal_player + two_horizontal_player + two_vertical_player + three_diagonal_player + three_horizontal_player + three_vertical_player + four_diagonal_player + four_horizontal_player + four_vertical_player
-        print(player_score)
-        
-        
-        two_diagonal_opponent = 10 * self.in_a_row_diagonal(opponent, 2)
-        three_diagonal_opponent = 70 * self.in_a_row_diagonal(opponent, 3)
-        four_diagonal_opponent = 1000000 * self.in_a_row_diagonal(opponent, 4)
-        two_vertical_opponent = 10 * self.in_a_row_vertical(opponent, 2)
-        three_vertical_opponent = 70 * self.in_a_row_vertical(opponent, 3)
-        four_vertical_opponent = 1000000 * self.in_a_row_vertical(opponent, 4)
-        two_horizontal_opponent = 10 * self.in_a_row_horizontal(opponent, 2)
-        three_horizontal_opponent = 70 * self.in_a_row_horizontal(opponent, 3)
-        four_horizontal_opponent = 1000000 * self.in_a_row_horizontal(opponent, 4)
-        opponent_score += two_diagonal_opponent + two_horizontal_opponent + two_vertical_opponent + three_diagonal_opponent + three_horizontal_opponent + three_vertical_opponent + four_horizontal_opponent + four_diagonal_opponent + four_vertical_opponent
-        print(player_score)
-    
-        print(player_score)
-        print(opponent_score)
+
+        # add weights for 2s, 3s, and 4s, in a row for both players and opponents
+        player_score += self.weigh_current_connections(player, False)
+        opponent += self.weigh_current_connections(opponent, True)
         score = player_score - opponent_score
         return score
     
@@ -386,7 +384,7 @@ class Board:
             return None, 0
         elif depth == 0:
             return None, self.eval_function(player)
-            
+    
         if maximizing_turn:
             score = -math.inf
             next_move = random.choice(possible_moves)
