@@ -103,7 +103,6 @@ class BoardTests(unittest.TestCase):
                         [1, 0, 1, 0, 0, 0, 1]])
         board3.add_coin(0, 1)
         self.assertTrue(board3.has_specific_coin(1, 0, 1))
-        board3.print_board()
         board3.add_coin(0, 1)
         self.assertTrue(board3.has_specific_coin(0, 0, 1))
 
@@ -134,6 +133,14 @@ class BoardTests(unittest.TestCase):
                     [0, 0, 0, 1, 1, 1, 0]])
         self.assertFalse(this_board6.check_won(2))
 
+        this_board7 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 0, 2, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0]])
+        self.assertTrue(this_board7.check_won(2))
+
     def testGenerateNextStates(self):
         board_new = Board()
         new_states = board_new.generate_possible_moves()
@@ -151,28 +158,38 @@ class BoardTests(unittest.TestCase):
         self.assertFalse(self.board10.is_board_full())
         self.assertTrue(self.board12.is_board_full())
 
-    def testIsTerminal(self):
-        self.assertTrue(self.board12.terminal_state())
-        self.assertTrue(self.board2.terminal_state())
-        self.assertTrue(self.board7.terminal_state())
-        self.assertFalse(self.board1.terminal_state())
-        self.assertFalse(self.board11.terminal_state())
-
-    def testEvalFunc(self):
+    def testEvalFuncAndMinimax(self):
         this_board = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 2, 0]])
+        self.assertEqual(this_board.weigh_current_connections(1, True), 0)
+        self.assertEqual(this_board.weigh_current_connections(2, False), 0)
         self.assertEqual(this_board.eval_function(2), 4)
+        self.assertEqual(this_board.minimax(3, -math.inf, math.inf, True)[0], 4)
+        this_board0 = Board([[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 2, 2, 0]])
+        self.assertEqual(this_board0.weigh_current_connections(1, True), 80)
+        self.assertEqual(this_board0.weigh_current_connections(2, False), 10)
+        self.assertEqual(this_board0.eval_function(2), 3)
+        self.assertEqual(this_board0.minimax(3, -math.inf, math.inf, True)[0], 0)
+
         this_board2 = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 1, 0, 0, 0],
                     [0, 0, 0, 2, 1, 2, 0]])
-        self.assertEqual(this_board2.eval_function(2), 19)
+        self.assertEqual(this_board2.weigh_current_connections(1, True), 10)
+        self.assertEqual(this_board2.weigh_current_connections(2, False), 20)
+        self.assertEqual(this_board2.eval_function(2), 29)
+        self.assertEqual(this_board2.minimax(3, -math.inf, math.inf, True)[0], 4)
 
         this_board3 = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
@@ -180,7 +197,10 @@ class BoardTests(unittest.TestCase):
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 1, 0, 0, 0],
                     [0, 0, 0, 2, 1, 2, 0]])
-        self.assertEqual(this_board3.eval_function(2), 42)
+        self.assertEqual(this_board3.weigh_current_connections(1, True), 10)
+        self.assertEqual(this_board3.weigh_current_connections(2, False), 30)
+        self.assertEqual(this_board3.eval_function(2), 52)
+        self.assertEqual(this_board3.minimax(3, -math.inf, math.inf, True)[0], 5)
 
         this_board4 = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
@@ -188,27 +208,32 @@ class BoardTests(unittest.TestCase):
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 1, 1, 0, 0]])
-        self.assertEqual(this_board4.in_a_row_horizontal(1, 2), 2)
-        self.assertEqual(this_board4.eval_function(2), 64)
+        self.assertEqual(this_board4.weigh_current_connections(1, True), 20)
+        self.assertEqual(this_board4.weigh_current_connections(2, False), 60)
+        self.assertEqual(this_board4.eval_function(2), 84)
+        self.assertEqual(this_board4.minimax(3, -math.inf, math.inf, True)[0], 3)
+
         this_board5 = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 2, 0, 0, 0],
                     [0, 0, 0, 1, 1, 2, 0]])
-        self.assertEqual(this_board5.in_a_row_horizontal(1, 2), 1)
+        self.assertEqual(this_board5.weigh_current_connections(1, True), 10)
+        self.assertEqual(this_board5.weigh_current_connections(2, False), 30)
+        self.assertEqual(this_board5.eval_function(2), 45)
+        self.assertEqual(this_board5.minimax(3, -math.inf, math.inf, True)[0], 4)
 
-        print("eval func board 5")
-        print(this_board5.eval_function(2))
-        self.assertEqual(this_board5.eval_function(2), 35)
         this_board6 = Board([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 2, 0, 0],
                     [0, 0, 0, 0, 2, 0, 0],
                     [0, 0, 0, 0, 2, 0, 0],
                     [0, 0, 0, 1, 1, 1, 0]])
-        self.assertEqual(this_board6.eval_function(2), -86)
-        #self.assertEqual(this_board6.minimax(3, -math.inf, math.inf, True), 4)
+        self.assertEqual(this_board6.weigh_current_connections(1, True), 160)
+        self.assertEqual(this_board6.weigh_current_connections(2, False), 60)
+        self.assertEqual(this_board6.eval_function(2), 74)
+        self.assertEqual(this_board6.minimax(3, -math.inf, math.inf, True)[0], 4)
 
     def testInARowHorizontal(self):
         self.assertEqual(self.board10.in_a_row_horizontal( 1, 2), 2)
@@ -225,11 +250,15 @@ class BoardTests(unittest.TestCase):
         self.assertEqual(self.board9.in_a_row_vertical( 2,2), 4)
         self.assertEqual(self.board9.in_a_row_vertical(1 ,2), 2)
         self.assertEqual(self.board9.in_a_row_vertical( 2, 3), 1)
+        self.assertEqual(self.board4.in_a_row_vertical( 1, 3), 0)
+
 
     def testInARowDiagonal(self):
-       # self.assertEqual(self.board4.in_a_row_diagonal(2,3), 2)
+
+        self.assertEqual(self.board4.in_a_row_diagonal(2,3), 3)
         self.assertEqual(self.board4.in_a_row_diagonal(1,3), 0)
-       # self.assertEqual(self.board4.in_a_row_diagonal(2,2), 3)
+        self.assertEqual(self.board4.in_a_row_diagonal(2,2), 4)
+        self.assertEqual(self.board4.in_a_row_diagonal( 1, 3), 0)
 
 
 def main():
