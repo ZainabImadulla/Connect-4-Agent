@@ -3,7 +3,6 @@ import customtkinter
 import tkinter as tk
 from board import Board
 
-
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -23,28 +22,32 @@ class App(customtkinter.CTk):
                 self.buttons[i][j].grid(row=i+1, column=j)
 
     def handle_click(self, column):
-        print(self.board.move_possible(column))
         if(self.board.move_possible(column)):
             self.board.add_coin(column, self.player)
             self.update_board()
             self.label.grid_forget()
-            if self.board.check_won(1):
-                self.disable_board()
-                self.label = customtkinter.CTkLabel(self, text="Player 1 Won")
-            elif self.board.check_won(2):
-                self.disable_board()
-                self.label = customtkinter.CTkLabel(self, text="Player 2 Won")    
-            elif self.board.is_board_full():
-                self.disable_board()
-                self.label = customtkinter.CTkLabel(self, text="Game Tied")  
+            self.check_game_over()
+        move, _ = self.board.minimax(4, -math.inf, math.inf, True)
+        self.board.add_coin(move, self.minimax)
+        self.update_board()
+        self.board.print_board()
+        self.label.grid_forget()
+        self.label.grid(row=0, column=3)
+        self.check_game_over()
 
-            move, _ = self.board.minimax(3, -math.inf, math.inf, True)
-            print(move)
-            #if move is not None and self.board.move_possible(move):
-            self.board.add_coin(move, self.minimax)
-            self.update_board()
-            self.label.grid_forget()
-            self.label.grid(row=0, column=3)
+            
+
+    def check_game_over(self):
+        if self.board.check_won(1):
+            self.disable_board()
+            self.label = customtkinter.CTkLabel(self, text="Player 1 Won")
+        elif self.board.check_won(2):
+            self.disable_board()
+            self.label = customtkinter.CTkLabel(self, text="Player 2 Won")    
+        elif self.board.is_board_full():
+            self.disable_board()
+            self.label = customtkinter.CTkLabel(self, text="Game Tied")  
+
        
         
     def disable_board(self):
@@ -72,7 +75,6 @@ class App(customtkinter.CTk):
                 elif(current_board[i][j] == 2):
                     self.buttons[i][j] = customtkinter.CTkButton(self, 100, 87.5, text="", image=self.player2, fg_color="#2a2b2e", bg_color="#2a2b2e", command=lambda j=j:self.handle_click(j))
                     self.buttons[i][j].grid(row=i+1, column=j)
-
 
 
 def main():
