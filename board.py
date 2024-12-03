@@ -49,6 +49,8 @@ class Board:
         return True  
     
     def terminal_state(self):
+        print("REACHED TERMINAL STATE")
+        self.print_board()
         return self.is_board_full() or self.check_won(1) or self.check_won(2)
 
 
@@ -149,7 +151,6 @@ class Board:
             print()
 
     def getBoard(self):
-        self.print_board()
         return self.board
     
     def in_a_row_horizontal(self, player, num):
@@ -161,9 +162,8 @@ class Board:
             for i in range(7):
                 if self.board[row][i] == player:
                     count += 1
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                         
                 elif self.board[row][i] == (3 - player):
@@ -173,7 +173,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space == 1:
+                    if count >= num and empty_space == 1:
                         total_num_in_row += 1
                         count = 0
             empty_space = 0
@@ -188,10 +188,8 @@ class Board:
             for i in range(6):
                 if self.board[i][column] == player:
                     count += 1
-                    if count == num and empty_space >= 1:
-                        print("reached")
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                 elif self.board[i][column] == (3 - player):
                     count = 0
@@ -200,8 +198,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space >= 1:
-                        print("reached")
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
                         count = 0
             empty_space = 0
@@ -218,9 +215,8 @@ class Board:
             for z in range(f, -1, -1):
                 if self.has_specific_coin(z, x, player) :
                     count += 1
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                 elif self.has_specific_coin(z, x, opponent):
                     count = 0
@@ -229,7 +225,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
                         count = 0
                 x += 1
@@ -241,9 +237,8 @@ class Board:
             for z in range(f, 6):
                 if self.has_specific_coin(y, z, player):
                     count += 1
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                 elif self.has_specific_coin(y, z, opponent):
                     count = 0
@@ -252,7 +247,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
                         count = 0
                 y -= 1
@@ -264,9 +259,8 @@ class Board:
             for z in range(f, -1, -1):
                 if self.has_specific_coin(z, x, player):
                     count += 1
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                 elif self.has_specific_coin(z, x, opponent):
                     count = 0
@@ -275,7 +269,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
                         count = 0
                 x -= 1
@@ -287,9 +281,8 @@ class Board:
             for z in range(f, -1, -1):
                 if self.has_specific_coin(y, z, player):
                     count += 1
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
-                        count = 1
                         empty_space = 0
                 elif self.has_specific_coin(y, z, opponent):
                     count = 0
@@ -298,7 +291,7 @@ class Board:
                     empty_space += 1
                     if empty_space >= 2:
                         count = 0
-                    if count == num and empty_space >= 1:
+                    if count >= num and empty_space >= 1:
                         total_num_in_row += 1
                         count = 0
                 y -= 1
@@ -364,7 +357,9 @@ class Board:
         if depth == 0 or terminal:
             if terminal:
                 if self.check_won(player):
+                    print("PLAYER WON")
                     return None, math.inf
+                    
                 elif self.check_won(opponent):
                     return None, -math.inf
                 else: 
@@ -378,17 +373,23 @@ class Board:
             next_move = random.choice(possible_moves)
             
             for move in possible_moves:
+                print("move")
+                print(move)
                 state = Board(self.board)
                 state.add_coin(move, player)
                 new_score = state.minimax(depth - 1, alpha, beta, False)[1]
             
                 if new_score > score:
                     score = new_score
+                    print("MOVE")
+                    print(move)
                     next_move = move
                 alpha = max(alpha, score)
 
                 if alpha >= beta:
                     break
+            print("move returned")
+            print(next_move)
             print("final score max")
             print(score)
             return next_move, score
@@ -398,7 +399,7 @@ class Board:
             next_move = random.choice(possible_moves)
             for move in possible_moves:
                 state = Board(self.board)
-                state.add_coin(move, player)
+                state.add_coin(move, opponent)
                 new_score = state.minimax(depth - 1, alpha, beta, True)[1]
 
                 if new_score < score:
