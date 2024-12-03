@@ -419,3 +419,12 @@ class Board:
                 if alpha >= beta:
                     break
             return next_move, score
+
+    # Makes a random valid move 
+    def random_move(self):
+        while(True):
+            random_number = random.randint(0, 6)
+            if(self.move_possible(random_number)):
+                return random_number
+    
+        
