@@ -11,4 +11,6 @@ $ source env/bin/activate
 
 $ pip install -r requirements.txt    
 
+After completing the setup, start the program by running the connect4.py file.
+
 Note: When running the program on a Windows computer, the Minimax vs. Minimax and Minimax vs. Random game modes may experience some lag, potentially causing the window to display a "Not Responding" message. Please do not close the window; the results will appear on the board after a brief loading period. These game modes run smoothly on Mac computers without any issues.
