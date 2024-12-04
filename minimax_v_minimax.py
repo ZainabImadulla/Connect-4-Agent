@@ -2,7 +2,7 @@ import math
 import customtkinter
 import tkinter as tk
 from board import Board
-from PIL import Image, ImageTk
+
 
 
 class TwoMinimax(customtkinter.CTkFrame):
@@ -20,8 +20,8 @@ class TwoMinimax(customtkinter.CTkFrame):
         self.reset.grid(row=0, column=5)
 
         self.transparent = tk.PhotoImage(file="./empty.png")
-        self.player1 = ImageTk.PhotoImage(file="./player1.png")
-        self.player2 = ImageTk.PhotoImage(file="./player2.png")
+        self.player1 = tk.PhotoImage(file="./player1.png")
+        self.player2 = tk.PhotoImage(file="./player2.png")
         self.start_button = customtkinter.CTkButton(self, 100, 87.5, text = "Begin Game!", command = lambda: self.handle_click())
         self.start_button.grid(row=0, column=0)
         for i in range(6):
