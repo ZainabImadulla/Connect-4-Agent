@@ -32,7 +32,10 @@ class TwoMinimax(customtkinter.CTkFrame):
     def handle_click(self):
         self.start_button.grid_forget()
         while(not (self.board.check_won(1) or self.board.check_won(2) or self.board.is_board_full())):
-            move, _ = self.board.minimax(4, -math.inf, math.inf, True, self.player, "offensive")
+            if(self.player == 1):
+                move, _ = self.board.minimax(4, -math.inf, math.inf, True, self.player, "offensive")
+            else:
+                move, _ = self.board.minimax(4, -math.inf, math.inf, True, self.player, "offensive")
             self.board.add_coin(move, self.player)
             self.after(1000, self.update_board())
             self.label.grid_forget()
@@ -81,7 +84,7 @@ class TwoMinimax(customtkinter.CTkFrame):
                     self.buttons[i][j].grid(row=i+1, column=j)
 
     def menu(self):
-            self.master.switch_frame("MainMenu")
+        self.master.switch_frame("MainMenu")
 
     def resetBoard(self):
         self.master.switch_frame("TwoMinimax")

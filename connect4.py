@@ -29,6 +29,7 @@ class Connect4(customtkinter.CTk):
             frame.pack_forget()
 
         if frame_class == "MainMenu":
+            self.MainMenu = MainMenu(self)
             self.MainMenu.pack(fill="both", expand=True)
         elif frame_class == "TwoMinimax":
             self.TwoMinimax = TwoMinimax(self)
