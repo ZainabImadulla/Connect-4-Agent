@@ -32,7 +32,7 @@ class MinimaxVRandom(customtkinter.CTkFrame):
         self.start_button.grid_forget()
         while(not (self.board.check_won(1) or self.board.check_won(2) or self.board.is_board_full())):
             if(self.player == 1):
-                move, _ = self.board.minimax(4, -math.inf, math.inf, True)
+                move, _ = self.board.minimax(4, -math.inf, math.inf, True, self.player, "offensive")
             else:
                 move = self.board.random_move()
             self.board.add_coin(move, self.player)

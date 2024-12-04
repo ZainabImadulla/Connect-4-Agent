@@ -77,8 +77,9 @@ class Board:
                     count = 0
         return False
 
-     # method check_diagonal will check all diagonal paths for 4 coins in a row of the player given by the parameter
-    def check_diagonal(self, player):
+    # method check_diagonal_top_left checks if there are any 4 coins in a diagonal row 
+    # of the given player in the top left portion of the board
+    def check_diagonal_top_left(self, player):
         for f in range(3, 6):
             count = 0
             x = 0
@@ -92,7 +93,11 @@ class Board:
                 x += 1
             if count >= 4:
                 return True
-        
+        return False
+    
+    # method check_diagonal_bottom_left checks if there are any 4 coins in a diagonal row 
+    # of the given player in the bottom left portion of the board   
+    def check_diagonal_bottom_left(self, player):
         for f in range(1, 4):
             count = 0
             y = 5
@@ -106,8 +111,11 @@ class Board:
                 y -= 1
             if count >= 4:
                 return True
-
-
+        return False
+    
+    # method check_diagonal_top_right checks if there are any 4 coins in a diagonal row 
+    # of the given player in the top right portion of the board
+    def check_diagonal_top_right(self, player):
         for f in range(3, 6):
             count = 0
             x = 6
@@ -121,7 +129,11 @@ class Board:
                 x -= 1
             if count >= 4:
                 return True
-
+        return False
+    
+    # method check_diagonal_bottom_right checks if there are any 4 coins in a diagonal row 
+    # of the given player in the bottom right portion of the board
+    def check_diagonal_bottom_right(self, player):
         for f in range(3, 7):
             count = 0
             y = 5
@@ -136,6 +148,13 @@ class Board:
             if count >= 4:
                 return True
         return False
+
+
+    # method check_diagonal will check all diagonal paths for 4 coins in a row of the player given by the parameter
+    def check_diagonal(self, player):
+        return self.check_diagonal_top_left(player) or self.check_diagonal_bottom_left(player) or self.check_diagonal_top_right(player) or self.check_diagonal_bottom_right(player)
+
+        
     
     # method generate_possible_moves will give a list of all possible rows that could be the next move in the game
     def generate_possible_moves(self):
@@ -214,12 +233,9 @@ class Board:
             count = 0
         return total_num_in_row
     
-    # method in_a_row_diagonal returns the number of times the given player from the parameter has 
-    # given num parameter number coins in a diagonal path with one space next to or between the num coins 
-    # the empty space is used to track whether it would be a possible move to build off of this num coins   
-    def in_a_row_diagonal(self, player, num):
-        opponent = 3 - player
-        total_num_in_row = 0
+    # method diagonal_top_left calculates the number of num coins of specific player in a diagonal row within the top
+    # left portion of the board
+    def diagonal_top_left(self, player, num, opponent, total_num_in_row):
         for f in range(3, 6):
             count = 0
             empty_space = 0
@@ -241,7 +257,11 @@ class Board:
                         total_num_in_row += 1
                         count = 0
                 x += 1
-        
+        return total_num_in_row
+    
+    # method diagonal_bottom_left calculates the number of num coins of specific player in a diagonal row within the bottom
+    # left portion of the board
+    def diagonal_bottom_left(self, player, num, opponent, total_num_in_row):
         for f in range(1, 4):
             count = 0
             empty_space = 0
@@ -263,7 +283,11 @@ class Board:
                         total_num_in_row += 1
                         count = 0
                 y -= 1
-            
+        return total_num_in_row
+    
+     # method diagonal_top_right calculates the number of num coins of specific player in a diagonal row within the top
+    # right portion of the board
+    def diagonal_top_right(self, player, num, opponent, total_num_in_row):
         for f in range(3, 6):
             count = 0
             empty_space = 0
@@ -285,7 +309,11 @@ class Board:
                         total_num_in_row += 1
                         count = 0
                 x -= 1
-
+        return total_num_in_row
+    
+    # method diagonal_bottom_right calculates the number of num coins of specific player in a diagonal row within the bottom
+    # right portion of the board
+    def diagonal_bottom_right(self, player, num, opponent, total_num_in_row):
         for f in range(3, 7):
             count = 0
             empty_space = 0
@@ -307,18 +335,40 @@ class Board:
                         total_num_in_row += 1
                         count = 0
                 y -= 1
-            
+        return total_num_in_row
+
+
+    
+    # method in_a_row_diagonal returns the number of times the given player from the parameter has 
+    # given num parameter number coins in a diagonal path with one space next to or between the num coins, 
+    # the empty space is used to track whether it would be a possible move to build off of this num coins   
+    def in_a_row_diagonal(self, player, num):
+        opponent = 3 - player
+        total_num_in_row = 0
+        top_left = self.diagonal_top_left(player, num, opponent, total_num_in_row)
+        bottom_left = self.diagonal_bottom_left(player, num, opponent, total_num_in_row)
+        top_right = self.diagonal_top_right(player, num, opponent, total_num_in_row)
+        bottom_right = self.diagonal_bottom_right(player, num, opponent, total_num_in_row)
+        total_num_in_row += top_left + bottom_left + top_right + bottom_right
         return total_num_in_row
     
     # method weigh_current_connections gets the weight of the given player by checking how many
     # 2s, 3s, and 4s the player has in their current state, this is a helper method for eval_func
     # (also abstracts duplicate code)
-    def weigh_current_connections(self, player, is_opponent):
+    def weigh_current_connections(self, player, is_opponent, type):
         score = 0
-        three_weight = 50
-        if is_opponent:
+        # current heuristic slightly prioritizes offensive moves
+        if type == "offensive":
             three_weight = 70
+            if is_opponent:
+                three_weight = 30
         
+        elif type == "defensive":
+            three_weight = 30
+            if is_opponent:
+                three_weight = 70
+        
+        # calculate all 2s, 3s, and 4s in all directions, multiply by weights, and sum together
         two_diagonal = 10 * self.in_a_row_diagonal(player, 2)
         three_diagonal = three_weight * self.in_a_row_diagonal(player, 3)
         four_diagonal = 1000000 * self.in_a_row_diagonal(player, 4)
@@ -332,15 +382,15 @@ class Board:
         score += three_diagonal + three_horizontal + three_vertical
         score += four_diagonal + four_horizontal + four_vertical
         return score
-        
-    # method eval_function is used as a heuristic method to evaluate a given players board state
-    # this method uses center weights as well as weighing how many 2 in a row, 3 in a row, and 4 in a row,
-    # are present for the player and the opponent to evaluate the players state relative to its opponent
-    def eval_function(self, player):
-        score = 0
-        opponent = 3 - player
 
-        # set and apply weight for prioritizing center moves
+
+    # method center_weights gives each player a utility measure based on their spot relative to the center
+    def center_weight(self, player):
+        opponent = 3 - player
+        player_score = 0
+        opponent_score = 0
+
+         # set and apply weight for prioritizing center moves
         eval_board = Board(
                     [[3, 4, 5, 7, 5, 4, 3],
                     [4, 6, 8, 10, 8, 6, 4],
@@ -357,10 +407,25 @@ class Board:
                     player_score += eval_board.board[j][i]
                 elif self.board[j][i] == opponent:
                     opponent_score += eval_board.board[j][i]
+        
+        return player_score, opponent_score
 
-        # add weights for 2s, 3s, and 4s, in a row for both players and opponents
-        player_score += self.weigh_current_connections(player, False)
-        opponent += self.weigh_current_connections(opponent, True)
+    # method eval_function is used as a heuristic method to evaluate a given players board state
+    # this method uses center weights as well as weighing how many 2 in a row, 3 in a row, and 4 in a row,
+    # are present for the player and the opponent to evaluate the players state relative to its opponent
+    def eval_function(self, player, type):
+        score = 0
+        opponent = 3 - player
+
+        # all heuristics will always consider center weights
+        player_score, opponent_score = self.center_weight(player)
+
+        # if the heuristic type is not just center we will consider connections on the board
+        # and whether to be offensive or defensive, based on the type
+        if type != "center":
+            # add weights for 2s, 3s, and 4s, in a row for both players and opponents
+            player_score += self.weigh_current_connections(player, False, type)
+            opponent += self.weigh_current_connections(opponent, True, type)
         score = player_score - opponent_score
         return score
     
@@ -370,9 +435,8 @@ class Board:
     # strategies to determine the best possible move. It also uses recursive depth-limited search to
     # explore game states, evaluates terminal states using our eval_function, and incorporates Alpha-Beta pruning to optimize
     # the search by eliminating branches that cannot influence the final decision.
-    def minimax(self, depth, alpha, beta, maximizing_turn):
-        player = 2
-        opponent = 1
+    def minimax(self, depth, alpha, beta, maximizing_turn, player, type):
+        opponent = 3 - player
         possible_moves = self.generate_possible_moves() 
 
         # checking terminal states: if we're either player is won, we're at a draw, or if we've reached the depth limit
@@ -383,39 +447,48 @@ class Board:
         elif self.is_board_full(): 
             return None, 0
         elif depth == 0:
-            return None, self.eval_function(player)
+            return None, self.eval_function(player, type)
     
+        # maximizing turn
         if maximizing_turn:
-            score = -math.inf
-            next_move = random.choice(possible_moves)
-            
+            score = -math.inf # initialize best score to lowest value to get max score
+            next_move = random.choice(possible_moves) # initialize to random column to start
+            # iterate through possible moves and recursively call minimax alternating whether its the maximizing players turn
             for move in possible_moves:
                 state = Board(self.board)
                 state.add_coin(move, player)
-                new_score = state.minimax(depth - 1, alpha, beta, False)[1]
+                new_score = state.minimax(depth - 1, alpha, beta, False, player, type)[1]
             
+                # update the best score and move if the new score is better
                 if new_score > score:
                     score = new_score
                     next_move = move
+                # update alpha
                 alpha = max(alpha, score)
 
+                # prune branches if alpha is no longer less than beta.
                 if alpha >= beta:
                     break
+
             return next_move, score
         
         else:
-            score = math.inf
-            next_move = random.choice(possible_moves)
-            for move in possible_moves:
+            score = math.inf # initialize best score to highest value to get min score
+            next_move = random.choice(possible_moves)  # initialize to random column to start
+            # iterate through possible moves and recursively call minimax alternating whether its the maximizing players turn
+            for move in possible_moves: 
                 state = Board(self.board)
                 state.add_coin(move, opponent)
-                new_score = state.minimax(depth - 1, alpha, beta, True)[1]
+                new_score = state.minimax(depth - 1, alpha, beta, True, player, type)[1]
 
+                 # update the best score and move if the new score is better
                 if new_score < score:
                     score = new_score
                     next_move = move
-                    beta = min(beta, score)
-
+                # update beta
+                beta = min(beta, score)
+                
+                # prune branches if alpha is no longer less than beta.
                 if alpha >= beta:
                     break
             return next_move, score

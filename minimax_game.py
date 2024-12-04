@@ -34,7 +34,7 @@ class SingleMinimax(customtkinter.CTkFrame):
             self.label = customtkinter.CTkLabel(self, text="Player 2's Turn")
             self.label.grid(row=0, column=3)
             if(not self.check_game_over()):
-                move, _ = self.board.minimax(4, -math.inf, math.inf, True)
+                move, _ = self.board.minimax(4, -math.inf, math.inf, True, self.minimax, "offensive")
                 self.after(500, self.board.add_coin(move, self.minimax))
                 self.update_board()
                 self.label.grid_forget()
